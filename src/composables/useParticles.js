@@ -11,120 +11,111 @@ export const useParticles = (canvasRef) => {
         if (!canvasRef.value) return;
 
         const container = canvasRef.value.parentElement;
-        canvasRef.value.width = container.clientWidth;
-        canvasRef.value.height = container.clientHeight;
-        ctx = canvasRef.value.getContext('2d');
+        const screenWidth = window.innerWidth;
+        const screenHeight = window.innerHeight;
+        
+        // Используем devicePixelRatio для четкости на retina дисплеях
+        const dpr = window.devicePixelRatio || 1;
+        canvasRef.value.width = container.clientWidth * dpr;
+        canvasRef.value.height = container.clientHeight * dpr;
+        
+        // Устанавливаем CSS размеры
+        canvasRef.value.style.width = `${container.clientWidth}px`;
+        canvasRef.value.style.height = `${container.clientHeight}px`;
 
-        // Создание частиц с разными свойствами
-        const particleCount = Math.min(200, Math.floor(window.innerWidth * 0.2));
+        ctx = canvasRef.value.getContext('2d', {
+            willReadFrequently: false,
+            alpha: true
+        });
+        
+        // Масштабируем контекст
+        ctx.scale(dpr, dpr);
+
+        // Адаптивное количество частиц в зависимости от размера экрана
+        const baseParticleCount = 100; // базовое количество для экрана 1920x1080
+        const screenRatio = (screenWidth * screenHeight) / (1920 * 1080);
+        const particleCount = Math.min(150, Math.floor(baseParticleCount * screenRatio));
+        
         for (let i = 0; i < particleCount; i++) {
-            particles.push({
+            const particle = {
                 x: Math.random() * canvasRef.value.width,
                 y: Math.random() * canvasRef.value.height,
-                size: Math.random() * 4 + 1,
-                speedX: Math.random() * 3 - 1.5,
-                speedY: Math.random() * 3 - 1.5,
-                color: `hsl(${Math.random() * 60 + 200}, 100%, 70%)`,
-                originalSize: Math.random() * 4 + 1,
-                angle: Math.random() * Math.PI * 2,
-                frequency: Math.random() * 0.1 + 0.01
-            });
+                velocity: {
+                    x: (Math.random() - 0.5) * 0.5,
+                    y: (Math.random() - 0.5) * 0.5
+                },
+                size: Math.random() * 3 + 1,
+                color: `hsla(${hue}, 100%, 50%, ${Math.random() * 0.3 + 0.2})`
+            };
+            particles.push(particle);
+            hue += 360 / particleCount;
         }
-
-        // Следим за движением мыши
-        canvasRef.value.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('resize', handleResize);
 
         animateParticles();
     };
 
     const handleMouseMove = (event) => {
-        mouse.x = event.x;
-        mouse.y = event.y;
+        const rect = canvasRef.value.getBoundingClientRect();
+        mouse.x = event.clientX - rect.left;
+        mouse.y = event.clientY - rect.top;
+    };
+
+    const handleMouseLeave = () => {
+        mouse.x = canvasRef.value.width / 2;
+        mouse.y = canvasRef.value.height / 2;
     };
 
     const handleResize = () => {
         if (!canvasRef.value) return;
 
         const container = canvasRef.value.parentElement;
-        canvasRef.value.width = container.clientWidth;
-        canvasRef.value.height = container.clientHeight;
+        const dpr = window.devicePixelRatio || 1;
+        const newWidth = container.clientWidth * dpr;
+        const newHeight = container.clientHeight * dpr;
+
+        // Сохраняем текущие позиции частиц относительно размеров экрана
+        const widthRatio = newWidth / canvasRef.value.width;
+        const heightRatio = newHeight / canvasRef.value.height;
+
+        // Обновляем размеры канваса
+        canvasRef.value.width = newWidth;
+        canvasRef.value.height = newHeight;
+        canvasRef.value.style.width = `${container.clientWidth}px`;
+        canvasRef.value.style.height = `${container.clientHeight}px`;
+
+        // Обновляем контекст
+        ctx = canvasRef.value.getContext('2d', {
+            willReadFrequently: false,
+            alpha: true
+        });
+        ctx.scale(dpr, dpr);
+
+        // Масштабируем позиции частиц пропорционально новому размеру
+        particles.forEach(particle => {
+            particle.x *= widthRatio;
+            particle.y *= heightRatio;
+        });
     };
 
     const animateParticles = () => {
-        if (!canvasRef.value || !ctx) return;
-
-        // Очистка с эффектом затухания
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-        ctx.fillRect(0, 0, canvasRef.value.width, canvasRef.value.height);
-
-        // Изменение цвета
-        hue += 0.5;
-
-        // Обновление и отрисовка частиц
+        ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
+        
         particles.forEach(particle => {
-            // Плавное движение с волнообразным эффектом
-            particle.angle += particle.frequency;
-            particle.x += particle.speedX + Math.cos(particle.angle) * 0.5;
-            particle.y += particle.speedY + Math.sin(particle.angle) * 0.5;
+            // Обновляем позицию
+            particle.x += particle.velocity.x;
+            particle.y += particle.velocity.y;
 
-            // Отскок от границ
-            if (particle.x < 0 || particle.x > canvasRef.value.width) {
-                particle.speedX = -particle.speedX;
-            }
-            if (particle.y < 0 || particle.y > canvasRef.value.height) {
-                particle.speedY = -particle.speedY;
-            }
+            // Проверяем границы
+            if (particle.x < 0) particle.x = canvasRef.value.width;
+            if (particle.x > canvasRef.value.width) particle.x = 0;
+            if (particle.y < 0) particle.y = canvasRef.value.height;
+            if (particle.y > canvasRef.value.height) particle.y = 0;
 
-            // Взаимодействие с курсором
-            const dx = mouse.x - particle.x;
-            const dy = mouse.y - particle.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < mouse.radius) {
-                const force = (mouse.radius - distance) / mouse.radius;
-                const angle = Math.atan2(dy, dx);
-                particle.x -= Math.cos(angle) * force * 3;
-                particle.y -= Math.sin(angle) * force * 3;
-                particle.size = particle.originalSize * (1 + force * 2);
-
-                // Изменение цвета при взаимодействии
-                particle.color = `hsl(${(hue + force * 60) % 360}, 100%, 70%)`;
-            } else {
-                particle.size = particle.originalSize;
-                particle.color = `hsl(${Math.random() * 60 + 200}, 100%, 70%)`;
-            }
-
-            // Отрисовка частицы с свечением
+            // Рисуем частицу
             ctx.beginPath();
             ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-
-            // Градиент для свечения
-            const gradient = ctx.createRadialGradient(
-                particle.x, particle.y, 0,
-                particle.x, particle.y, particle.size * 2
-            );
-            gradient.addColorStop(0, particle.color);
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-            ctx.fillStyle = gradient;
+            ctx.fillStyle = particle.color;
             ctx.fill();
-
-            // Отрисовка линий между близкими частицами
-            particles.forEach(otherParticle => {
-                const dx = particle.x - otherParticle.x;
-                const dy = particle.y - otherParticle.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < 100) {
-                    ctx.beginPath();
-                    ctx.strokeStyle = `rgba(255, 255, 255, ${0.2 * (1 - distance / 100)})`;
-                    ctx.lineWidth = 0.5;
-                    ctx.moveTo(particle.x, particle.y);
-                    ctx.lineTo(otherParticle.x, otherParticle.y);
-                    ctx.stroke();
-                }
-            });
         });
 
         animationId = requestAnimationFrame(animateParticles);
@@ -134,11 +125,25 @@ export const useParticles = (canvasRef) => {
         if (animationId) {
             cancelAnimationFrame(animationId);
         }
+        particles = [];
+    };
+
+    onMounted(() => {
+        if (!canvasRef.value) return;
+        canvasRef.value.addEventListener('mousemove', handleMouseMove);
+        canvasRef.value.addEventListener('mouseleave', handleMouseLeave);
+        window.addEventListener('resize', handleResize);
+        initParticles();
+    });
+
+    onUnmounted(() => {
         if (canvasRef.value) {
             canvasRef.value.removeEventListener('mousemove', handleMouseMove);
+            canvasRef.value.removeEventListener('mouseleave', handleMouseLeave);
         }
         window.removeEventListener('resize', handleResize);
-    };
+        stopParticles();
+    });
 
     return { initParticles, stopParticles };
 };

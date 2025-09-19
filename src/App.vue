@@ -9,18 +9,55 @@
       <ContentSection
           title="Infinite possibilities"
           :content="content1"
+          :floatingContent="[
+            {
+              title: 'Digital Innovation',
+              content: 'Exploring the frontiers of technology to create groundbreaking digital experiences.'
+            },
+            {
+              title: 'Creative Solutions',
+              content: 'Transforming ideas into reality through innovative design and development.'
+            },
+            {
+              title: 'User Experience',
+              content: 'Crafting seamless and engaging interactions that delight and inspire users.'
+            }
+          ]"
           class="parallax-container"
+          direction="right"
       />
 
-      <ImageSection
-          image-url="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80"
+            <ImageSection
+          :imageUrl="'/images/cyberpunk-city.jpg'"
           class="parallax-container"
-      />
+      >
+        <div class="text-center">
+          <h2 class="text-4xl md:text-5xl font-bold mb-6 glow-text fade-in-up">Digital Frontiers</h2>
+          <p class="text-xl md:text-2xl opacity-90 max-w-2xl mx-auto fade-in-up">
+            Where technology meets imagination, creating immersive experiences that push the boundaries of reality
+          </p>
+        </div>
+      </ImageSection>
 
-      <ContentSection
-          title="Beyond the horizon"
-          :content="content2"
+                                    <ContentSection
+          title="Vision & Innovation"
+          :content="content1"
+          :floatingContent="[
+            {
+              title: 'Breaking Boundaries',
+              content: 'Pushing the limits of what\'s possible in digital experiences through innovative thinking and creative solutions.'
+            },
+            {
+              title: 'Future Forward',
+              content: 'Embracing cutting-edge technologies to create immersive and engaging user experiences.'
+            },
+            {
+              title: 'Creative Excellence',
+              content: 'Combining artistic vision with technical expertise to deliver extraordinary digital experiences.'
+            }
+          ]"
           class="parallax-container"
+          direction="left"
       />
 
       <AppFooter />
