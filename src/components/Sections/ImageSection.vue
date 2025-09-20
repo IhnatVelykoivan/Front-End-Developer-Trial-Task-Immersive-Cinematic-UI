@@ -75,42 +75,5 @@ export default {
 </script>
 
 <style>
-.bg-grid-pattern {
-  background-image: 
-    linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 50px 50px;
-}
-
-.glow-point {
-  filter: blur(4px);
-  box-shadow: 0 0 15px currentColor;
-}
-
-@keyframes pulse-slow {
-  0%, 100% { transform: scale(1); opacity: 0.3; }
-  50% { transform: scale(1.5); opacity: 0.6; }
-}
-
-@keyframes pulse-medium {
-  0%, 100% { transform: scale(1); opacity: 0.4; }
-  50% { transform: scale(1.3); opacity: 0.7; }
-}
-
-@keyframes pulse-fast {
-  0%, 100% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.2); opacity: 0.8; }
-}
-
-.animate-pulse-slow {
-  animation: pulse-slow 4s ease-in-out infinite;
-}
-
-.animate-pulse-medium {
-  animation: pulse-medium 3s ease-in-out infinite;
-}
-
-.animate-pulse-fast {
-  animation: pulse-fast 2s ease-in-out infinite;
-}
+@import url('../../assets/styles/ImageSection.css');
 </style>

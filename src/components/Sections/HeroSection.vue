@@ -36,16 +36,5 @@ export default {
 </script>
 
 <style scoped>
-.fade-in-up {
-  opacity: 0;
-  transform: translateY(30px) rotateX(-15deg);
-  animation: fadeInUp 1.2s forwards;
-}
-
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0) rotateX(0);
-  }
-}
+@import url('../../assets/styles/HeroSection.css');
 </style>

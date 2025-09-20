@@ -15,12 +15,5 @@ export default {
 </script>
 
 <style scoped>
-.animate-pulse-slow {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.9; }
-  50% { opacity: 0.5; }
-}
+@import '../../assets/styles/ScrollIndicator.css';
 </style>
