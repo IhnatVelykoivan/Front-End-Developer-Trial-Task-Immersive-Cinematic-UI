@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full h-screen relative overflow-hidden parallax-container section-gradient">
+  <div :id="id" class="w-full h-screen relative overflow-hidden parallax-container section-gradient">
     <!-- Основное изображение с параллакс эффектом -->
     <div
       class="absolute inset-0 bg-cover bg-center scale-in transform-gpu"
@@ -37,22 +37,32 @@
     </div>
 
     <!-- Контент секции -->
-    <div class="relative z-10 w-full h-full flex items-center justify-center px-4">
-      <FloatingContent position="left">
-        <div class="space-y-4">
-          <h3 class="text-2xl font-semibold text-white/90">Visual Excellence</h3>
-          <p class="text-white/70">Crafting stunning visual experiences that captivate and inspire.</p>
+    <div class="relative z-10 w-full h-full flex items-center justify-center">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative">
+        <!-- Боковые FloatingContent блоки -->
+        <div class="hidden lg:block absolute left-0 xl:left-8 top-1/2 transform -translate-y-1/2">
+          <FloatingContent position="left">
+            <div class="space-y-4 max-w-xs">
+              <h3 class="text-2xl font-semibold text-white/90">Visual Excellence</h3>
+              <p class="text-white/70">Crafting stunning visual experiences that captivate and inspire.</p>
+            </div>
+          </FloatingContent>
         </div>
-      </FloatingContent>
 
-      <slot></slot>
-
-      <FloatingContent position="right">
-        <div class="space-y-4">
-          <h3 class="text-2xl font-semibold text-white/90">Artistic Vision</h3>
-          <p class="text-white/70">Where technology meets artistry to create unforgettable moments.</p>
+        <div class="hidden lg:block absolute right-0 xl:right-8 top-1/2 transform -translate-y-1/2">
+          <FloatingContent position="right">
+            <div class="space-y-4 max-w-xs">
+              <h3 class="text-2xl font-semibold text-white/90">Artistic Vision</h3>
+              <p class="text-white/70">Where technology meets artistry to create unforgettable moments.</p>
+            </div>
+          </FloatingContent>
         </div>
-      </FloatingContent>
+
+        <!-- Центральный контент -->
+        <div class="flex-1 max-w-5xl mx-auto text-center">
+          <slot></slot>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -66,6 +76,7 @@ export default {
     FloatingContent
   },
   props: {
+    id: String,
     imageUrl: {
       type: String,
       required: true

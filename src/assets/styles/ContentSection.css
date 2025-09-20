@@ -29,7 +29,7 @@
     pointer-events: auto;
     opacity: 0;
     transform: translateY(50px);
-    transition: opacity 0.6s ease-out, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     height: 100%;
     will-change: transform, opacity;
     visibility: hidden;
@@ -41,40 +41,26 @@
     transform: translateY(0);
 }
 
-.direction-right .floating-card {
-    transform: translateY(50px);
+/* Simplified card animations - removed complex transforms that were causing conflicts */
+.card-0, .card-1, .card-2 {
+    transition-delay: 0s;
 }
 
 .card-0 {
-    transform: translate(-50px, 30px);
     transition-delay: 0s;
 }
 
 .card-1 {
-    transform: translate(0, 50px);
-    transition-delay: 0.1s;
+    transition-delay: 0.15s;
 }
 
 .card-2 {
-    transform: translate(50px, 30px);
-    transition-delay: 0.2s;
-}
-
-.direction-right .card-0 {
-    transform: translate(50px, 30px);
-}
-
-.direction-right .card-1 {
-    transform: translate(0, 50px);
-}
-
-.direction-right .card-2 {
-    transform: translate(-50px, 30px);
+    transition-delay: 0.3s;
 }
 
 .floating-card.visible {
     opacity: 1;
-    transform: translate(0, 0) !important;
+    transform: translateY(0) !important;
 }
 
 @media (max-width: 1024px) {
@@ -105,20 +91,6 @@
         margin-top: 2rem;
     }
 }
-.card-2 { transform: translateX(100px); }
-
-.direction-right .card-0 { transform: translateX(100px); }
-.direction-right .card-1 { transform: translateY(100px); }
-.direction-right .card-2 { transform: translateX(-100px); }
-
-.floating-card.visible {
-    opacity: 1;
-    transform: translate(0) !important;
-}
-
-.delay-0 { transition-delay: 0.2s; }
-.delay-1 { transition-delay: 0.4s; }
-.delay-2 { transition-delay: 0.6s; }
 
 @media (max-width: 1200px) {
     .floating-cards-grid {
@@ -130,21 +102,49 @@
 @media (max-width: 768px) {
     .floating-cards-grid {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 1.5rem;
         padding: 0 1rem;
+        max-width: 100%;
     }
 
     .floating-card {
-        max-width: 320px;
+        max-width: 100%;
         margin: 0 auto;
+        width: 100%;
     }
 
     .card-0,
     .card-1,
-    .card-2,
-    .direction-right .card-0,
-    .direction-right .card-1,
-    .direction-right .card-2 {
-        transform: translateY(50px);
+    .card-2 {
+        transform: translateY(30px);
+        transition-delay: 0s;
+    }
+
+    .floating-card.visible {
+        transform: translateY(0) !important;
+    }
+
+    .floating-cards-wrapper {
+        margin-top: 2rem;
+        min-height: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .floating-cards-grid {
+        gap: 1rem;
+        padding: 0 0.75rem;
+    }
+
+    .floating-cards-wrapper {
+        margin-top: 1.5rem;
+    }
+    
+    .floating-card {
+        transform: translateY(20px);
+    }
+    
+    .floating-card.visible {
+        transform: translateY(0) !important;
     }
 }

@@ -90,3 +90,52 @@
 .animate-glow {
     animation: glow 10s ease-in-out infinite;
 }
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+    .animate-gradient {
+        animation: gradient 20s ease infinite;
+    }
+    
+    .animate-float-slow {
+        animation: float-slow 25s ease-in-out infinite;
+    }
+    
+    .animate-float-medium {
+        animation: float-medium 20s ease-in-out infinite;
+    }
+    
+    .animate-float-fast {
+        animation: float-fast 15s ease-in-out infinite;
+    }
+    
+    .animate-pulse-slow {
+        animation: pulse-slow 12s ease-in-out infinite;
+    }
+}
+
+@media (max-width: 480px) {
+    .animate-gradient {
+        animation: gradient 25s ease infinite;
+    }
+    
+    .animate-float-slow {
+        animation: float-slow 30s ease-in-out infinite;
+    }
+    
+    .animate-float-medium {
+        animation: float-medium 25s ease-in-out infinite;
+    }
+    
+    .animate-float-fast {
+        animation: float-fast 20s ease-in-out infinite;
+    }
+    
+    .animate-pulse-slow {
+        animation: pulse-slow 15s ease-in-out infinite;
+    }
+    
+    .animate-glow {
+        animation: glow 15s ease-in-out infinite;
+    }
+}

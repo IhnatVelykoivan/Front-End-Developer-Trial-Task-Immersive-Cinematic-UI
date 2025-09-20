@@ -6,6 +6,14 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        'xs': '480px',
+        'sm': '640px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
+        '2xl': '1536px',
+      },
       colors: {
         'primary': '#3B82F6',
         'secondary': '#6B7280',
@@ -28,6 +36,12 @@ export default {
                     400: '#d4d4d4',
                     500: '#a3a3a3',
                 }
+            },
+            spacing: {
+                'safe-top': 'env(safe-area-inset-top)',
+                'safe-bottom': 'env(safe-area-inset-bottom)',
+                'safe-left': 'env(safe-area-inset-left)',
+                'safe-right': 'env(safe-area-inset-right)',
             },
             animation: {
                 'fade-in-up': 'fadeInUp 1.2s ease-out forwards',

@@ -49,6 +49,114 @@
 }
 
 body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* Контейнеры и выравнивание */
+.container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+    .container {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+}
+
+@media (min-width: 1280px) {
+    .container {
+        max-width: 1280px;
+    }
+}
+
+@media (min-width: 1536px) {
+    .container {
+        max-width: 1536px;
+    }
+}
+
+/* Предотвращение переполнения */
+section {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Улучшенное выравнивание текста */
+.text-center {
+    text-align: center;
+}
+
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+    
+    main {
+        padding-top: 60px !important;
+    }
+    
+    section {
+        padding: 2rem 0;
+        min-height: auto !important;
+    }
+    
+    .hero-section {
+        min-height: 100vh;
+        padding: 4rem 1rem;
+    }
+    
+    .min-h-screen {
+        min-height: auto;
+        padding: 3rem 0;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 13px;
+    }
+    
+    main {
+        padding-top: 60px !important;
+    }
+    
+    section {
+        padding: 1.5rem 0;
+    }
+    
+    .hero-section {
+        padding: 3rem 0.75rem;
+    }
+    
+    .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+}
+
+body {
     font-family: 'Inter', sans-serif;
     background-color: #000;
     color: #fff;
@@ -96,23 +204,7 @@ body {
     transform: translateY(0) rotateX(0);
 }
 
-.stagger-text > * {
-    opacity: 0;
-    transform: translateY(20px);
-    filter: blur(10px);
-    transition: opacity 0.8s ease, transform 0.8s ease, filter 0.8s ease;
-}
-
-.stagger-text.visible > * {
-    opacity: 1;
-    transform: translateY(0);
-    filter: blur(0px);
-}
-
-.stagger-text.visible > *:nth-child(1) { transition-delay: 0.1s; }
-.stagger-text.visible > *:nth-child(2) { transition-delay: 0.2s; }
-.stagger-text.visible > *:nth-child(3) { transition-delay: 0.3s; }
-.stagger-text.visible > *:nth-child(4) { transition-delay: 0.4s; }
+/* CSS stagger-text animation removed to prevent conflicts with GSAP */
 
 .scale-in {
     opacity: 0;
@@ -125,10 +217,164 @@ body {
     transform: scale(1);
 }
 
+/* Вторичный более сдержанный glow эффект для Digital Frontiers */
+.secondary-glow-text {
+    text-shadow: 
+        0 0 4px rgba(255, 255, 255, 0.6),
+        0 0 8px rgba(255, 255, 255, 0.4),
+        0 0 16px rgba(96, 165, 250, 0.3),
+        0 0 32px rgba(96, 165, 250, 0.2);
+    color: #ffffff;
+    background: linear-gradient(45deg, #ffffff, #e2e8f0, #cbd5e1);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: secondary-glow-pulse 5s ease-in-out infinite alternate;
+}
+
+@keyframes secondary-glow-pulse {
+    0% {
+        filter: brightness(1) contrast(1);
+        text-shadow: 
+            0 0 4px rgba(255, 255, 255, 0.6),
+            0 0 8px rgba(255, 255, 255, 0.4),
+            0 0 16px rgba(96, 165, 250, 0.3);
+    }
+    100% {
+        filter: brightness(1.1) contrast(1.05);
+        text-shadow: 
+            0 0 6px rgba(255, 255, 255, 0.8),
+            0 0 12px rgba(255, 255, 255, 0.6),
+            0 0 24px rgba(96, 165, 250, 0.4),
+            0 0 48px rgba(96, 165, 250, 0.2);
+    }
+}
+
+/* Вторичная градиентная линия */
+.secondary-gradient-line {
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(96, 165, 250, 0.4) 25%, 
+        rgba(255, 255, 255, 0.6) 50%, 
+        rgba(96, 165, 250, 0.4) 75%, 
+        transparent 100%);
+    animation: secondary-gradient-flow 4s ease-in-out infinite;
+}
+
+@keyframes secondary-gradient-flow {
+    0%, 100% {
+        transform: scaleX(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scaleX(1.1);
+        opacity: 0.8;
+    }
+}
+
+/* Главный glow эффект для ZERO LIMITS */
+.main-glow-text {
+    text-shadow: 
+        0 0 8px rgba(255, 255, 255, 1),
+        0 0 16px rgba(255, 255, 255, 0.8),
+        0 0 24px rgba(59, 130, 246, 0.8),
+        0 0 48px rgba(59, 130, 246, 0.6),
+        0 0 96px rgba(147, 51, 234, 0.5),
+        0 0 144px rgba(147, 51, 234, 0.3),
+        0 0 192px rgba(244, 114, 182, 0.2);
+    color: #ffffff;
+    background: linear-gradient(45deg, #60a5fa, #a78bfa, #f472b6, #fbbf24);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: main-glow-pulse 4s ease-in-out infinite alternate;
+    letter-spacing: -0.05em;
+}
+
+@keyframes main-glow-pulse {
+    0% {
+        filter: brightness(1) contrast(1) saturate(1);
+        text-shadow: 
+            0 0 8px rgba(255, 255, 255, 1),
+            0 0 16px rgba(255, 255, 255, 0.8),
+            0 0 24px rgba(59, 130, 246, 0.8),
+            0 0 48px rgba(59, 130, 246, 0.6),
+            0 0 96px rgba(147, 51, 234, 0.5);
+    }
+    100% {
+        filter: brightness(1.3) contrast(1.2) saturate(1.1);
+        text-shadow: 
+            0 0 12px rgba(255, 255, 255, 1),
+            0 0 24px rgba(255, 255, 255, 1),
+            0 0 36px rgba(59, 130, 246, 1),
+            0 0 72px rgba(59, 130, 246, 0.8),
+            0 0 144px rgba(147, 51, 234, 0.6),
+            0 0 216px rgba(147, 51, 234, 0.4),
+            0 0 288px rgba(244, 114, 182, 0.3);
+    }
+}
+
+/* Градиентная линия для героя */
+.hero-gradient-line {
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(59, 130, 246, 0.8) 10%, 
+        rgba(147, 51, 234, 1) 30%, 
+        rgba(244, 114, 182, 1) 50%, 
+        rgba(251, 191, 36, 0.8) 70%, 
+        rgba(59, 130, 246, 0.6) 90%, 
+        transparent 100%);
+    animation: hero-gradient-flow 4s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+}
+
+@keyframes hero-gradient-flow {
+    0%, 100% {
+        transform: scaleX(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scaleX(1.2);
+        opacity: 1;
+    }
+}
+
 .glow-text {
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5),
-    0 0 20px rgba(255, 255, 255, 0.3),
-    0 0 30px rgba(255, 255, 255, 0.2);
+    text-shadow: 
+        0 0 5px rgba(255, 255, 255, 0.8),
+        0 0 10px rgba(255, 255, 255, 0.6),
+        0 0 20px rgba(59, 130, 246, 0.6),
+        0 0 40px rgba(59, 130, 246, 0.4),
+        0 0 80px rgba(147, 51, 234, 0.3),
+        0 0 120px rgba(147, 51, 234, 0.2);
+    color: #ffffff;
+    background: linear-gradient(45deg, #60a5fa, #a78bfa, #f472b6);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: glow-pulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes glow-pulse {
+    0% {
+        filter: brightness(1) contrast(1);
+        text-shadow: 
+            0 0 5px rgba(255, 255, 255, 0.8),
+            0 0 10px rgba(255, 255, 255, 0.6),
+            0 0 20px rgba(59, 130, 246, 0.6),
+            0 0 40px rgba(59, 130, 246, 0.4),
+            0 0 80px rgba(147, 51, 234, 0.3);
+    }
+    100% {
+        filter: brightness(1.2) contrast(1.1);
+        text-shadow: 
+            0 0 8px rgba(255, 255, 255, 1),
+            0 0 16px rgba(255, 255, 255, 0.8),
+            0 0 30px rgba(59, 130, 246, 0.8),
+            0 0 60px rgba(59, 130, 246, 0.6),
+            0 0 100px rgba(147, 51, 234, 0.4),
+            0 0 140px rgba(147, 51, 234, 0.3);
+    }
 }
 
 .glow-element {
@@ -144,7 +390,28 @@ body {
     .text-8xl {
         font-size: 4.5rem;
     }
+    
+    .glow-text {
+        text-shadow: 
+            0 0 3px rgba(255, 255, 255, 0.8),
+            0 0 6px rgba(255, 255, 255, 0.6),
+            0 0 12px rgba(59, 130, 246, 0.6),
+            0 0 24px rgba(59, 130, 246, 0.4),
+            0 0 48px rgba(147, 51, 234, 0.3);
+    }
+}
 
+@media (max-width: 480px) {
+    .glow-text {
+        font-size: 2.5rem !important;
+        line-height: 1.1;
+        text-shadow: 
+            0 0 2px rgba(255, 255, 255, 0.8),
+            0 0 4px rgba(255, 255, 255, 0.6),
+            0 0 8px rgba(59, 130, 246, 0.6),
+            0 0 16px rgba(59, 130, 246, 0.4);
+    }
+    
     .text-4xl {
         font-size: 2.5rem;
     }
