@@ -8,7 +8,7 @@
     <div class="scroll-progress-bar" :style="{ width: scrollProgress + '%' }"></div>
     
     <nav class="w-full max-w-none px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between w-full h-20">
+      <div class="flex items-center w-full h-20">
         <!-- Улучшенный логотип -->
         <div class="logo-container flex-shrink-0">
           <a href="#home" @click="scrollToSection('home')" class="logo-link group">
@@ -27,9 +27,9 @@
           </a>
         </div>
 
-        <!-- Профессиональная десктопная навигация -->
-        <div class="hidden lg:flex items-center justify-center flex-1 mx-8">
-          <nav class="flex items-center space-x-1">
+        <!-- Навигация растянутая на всю доступную ширину -->
+        <div class="flex items-center justify-center flex-1">
+          <nav class="flex items-center justify-center space-x-8 w-full max-w-2xl">
             <nav-link 
               v-for="item in navItems" 
               :key="item.id"
@@ -40,54 +40,8 @@
             />
           </nav>
         </div>
-        
-        <!-- Улучшенная мобильная кнопка меню -->
-        <button 
-          @click="toggleMobileMenu"
-          class="lg:hidden mobile-menu-btn flex-shrink-0"
-          :class="{ 'menu-open': isMobileMenuOpen }"
-          aria-label="Toggle menu"
-        >
-          <div class="menu-icon">
-            <span class="menu-line menu-line-1"></span>
-            <span class="menu-line menu-line-2"></span>
-            <span class="menu-line menu-line-3"></span>
-          </div>
-        </button>
       </div>
     </nav>
-
-    <!-- Профессиональное мобильное меню -->
-    <div class="mobile-menu" :class="{ 'menu-active': isMobileMenuOpen }">
-      <div class="mobile-menu-backdrop" @click="toggleMobileMenu"></div>
-      <div class="mobile-menu-content">
-        <div class="mobile-menu-header">
-          <div class="mobile-logo">
-            <div class="logo-icon small">
-              <div class="logo-rings">
-                <div class="ring ring-1"></div>
-                <div class="ring ring-2"></div>
-              </div>
-              <div class="logo-center">Z</div>
-            </div>
-            <span class="mobile-logo-text">ZERO LIMITS</span>
-          </div>
-        </div>
-        
-        <nav class="mobile-nav">
-          <nav-link 
-            v-for="(item, index) in navItems" 
-            :key="'mobile-' + item.id"
-            :href="item.href"
-            :label="item.label"
-            :is-active="activeSection === item.id"
-            :is-mobile="true"
-            :style="{ animationDelay: (index * 0.1) + 's' }"
-            @click="handleMobileNavClick(item.id)"
-          />
-        </nav>
-      </div>
-    </div>
   </header>
 </template>
 
@@ -102,7 +56,6 @@ export default {
   },
   setup() {
     const isScrolled = ref(false)
-    const isMobileMenuOpen = ref(false)
     const activeSection = ref('home')
     const scrollProgress = ref(0)
 
@@ -181,23 +134,9 @@ export default {
         })
         
         activeSection.value = sectionId
-        
-        // Закрываем мобильное меню если открыто
-        if (isMobileMenuOpen.value) {
-          isMobileMenuOpen.value = false
-        }
       } else {
         console.error('❌ Секция не найдена:', sectionId)
       }
-    }
-
-    const toggleMobileMenu = () => {
-      isMobileMenuOpen.value = !isMobileMenuOpen.value
-    }
-
-    const handleMobileNavClick = (sectionId) => {
-      scrollToSection(sectionId)
-      isMobileMenuOpen.value = false
     }
 
     onMounted(() => {
@@ -211,13 +150,10 @@ export default {
 
     return {
       isScrolled,
-      isMobileMenuOpen,
       activeSection,
       scrollProgress,
       navItems,
-      scrollToSection,
-      toggleMobileMenu,
-      handleMobileNavClick
+      scrollToSection
     }
   }
 }
