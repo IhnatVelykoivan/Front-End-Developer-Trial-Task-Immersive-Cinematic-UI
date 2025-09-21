@@ -9,9 +9,7 @@
   >
     <div 
       class="content-wrapper backdrop-blur-sm bg-white/5 rounded-lg p-6 shadow-2xl border border-white/10 cursor-pointer"
-      :style="{
-        transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`,
-      }"
+      ref="wrapperRef"
       @mouseenter="handleHover(true)"
       @mouseleave="handleHover(false)"
     >
@@ -45,31 +43,40 @@ export default {
   },
   setup(props) {
     const contentRef = ref(null);
+    const wrapperRef = ref(null);
     const isVisible = ref(false);
     const offset = ref({ x: 0, y: 0 });
     const scale = ref(1);
     let animation;
     let hoverAnimation;
+    let floatingTimeout; // Добавляем переменную для таймаута
 
     const initFloating = () => {
       if (!contentRef.value) return;
 
       const trigger = ScrollTrigger.create({
-        trigger: contentRef.value.closest('.floating-cards-wrapper'),
-        start: "top bottom",
-        end: "bottom top",
+        trigger: contentRef.value,
+        start: "top 80%",
+        end: "bottom 20%",
         toggleActions: "play none none reverse",
         onEnter: () => {
           isVisible.value = true;
-          startFloatingAnimation();
           
-          if (contentRef.value.parentElement) {
-            contentRef.value.parentElement.classList.add('visible');
-            
-            const initialY = 50;
-            const initialScale = 0.95;
-            
-            gsap.fromTo(contentRef.value.parentElement, 
+          // Отменяем предыдущий таймаут если есть
+          if (floatingTimeout) {
+            clearTimeout(floatingTimeout);
+            floatingTimeout = null;
+          }
+          
+          // Добавляем класс visible к самому элементу
+          contentRef.value.classList.add('visible');
+          
+          const initialY = 50;
+          const initialScale = 0.95;
+          
+          // Анимируем wrapper элемент
+          if (wrapperRef.value) {
+            gsap.fromTo(wrapperRef.value, 
               {
                 y: initialY,
                 opacity: 0,
@@ -80,60 +87,95 @@ export default {
                 opacity: 1,
                 scale: 1,
                 duration: 0.8,
-                ease: "power2.out",
-                clearProps: "all"
+                ease: "power2.out"
               }
             );
           }
+          
+          // Запускаем floating с задержкой, чтобы не конфликтовало
+          floatingTimeout = setTimeout(() => {
+            if (isVisible.value) { // Проверяем, что блок все еще видим
+              startFloatingAnimation();
+            }
+          }, 900); // После завершения входной анимации
         },
         onLeave: () => {
           isVisible.value = false;
-          if (animation) animation.kill();
           
-          if (contentRef.value.parentElement) {
-            gsap.to(contentRef.value.parentElement, {
+          // Отменяем таймаут floating анимации
+          if (floatingTimeout) {
+            clearTimeout(floatingTimeout);
+            floatingTimeout = null;
+          }
+          
+          if (animation) {
+            animation.kill();
+            animation = null;
+          }
+          
+          contentRef.value.classList.remove('visible');
+          
+          if (wrapperRef.value) {
+            gsap.to(wrapperRef.value, {
               y: 50,
               opacity: 0,
               scale: 0.95,
               duration: 0.6,
-              ease: "power2.in",
-              onComplete: () => {
-                contentRef.value.parentElement.classList.remove('visible');
-              }
+              ease: "power2.in"
             });
           }
         },
         onEnterBack: () => {
           isVisible.value = true;
-          startFloatingAnimation();
           
-          if (contentRef.value.parentElement) {
-            contentRef.value.parentElement.classList.add('visible');
-            
-            gsap.to(contentRef.value.parentElement, {
+          // Отменяем предыдущий таймаут если есть
+          if (floatingTimeout) {
+            clearTimeout(floatingTimeout);
+            floatingTimeout = null;
+          }
+          
+          contentRef.value.classList.add('visible');
+          
+          if (wrapperRef.value) {
+            gsap.to(wrapperRef.value, {
               y: 0,
               opacity: 1,
               scale: 1,
               duration: 0.8,
-              ease: "power2.out",
-              clearProps: "all"
+              ease: "power2.out"
             });
           }
+          
+          // Запускаем floating с задержкой, чтобы не конфликтовало
+          floatingTimeout = setTimeout(() => {
+            if (isVisible.value) { // Проверяем, что блок все еще видим
+              startFloatingAnimation();
+            }
+          }, 900); // После завершения входной анимации
         },
         onLeaveBack: () => {
           isVisible.value = false;
-          if (animation) animation.kill();
           
-          if (contentRef.value.parentElement) {
-            gsap.to(contentRef.value.parentElement, {
+          // Отменяем таймаут floating анимации
+          if (floatingTimeout) {
+            clearTimeout(floatingTimeout);
+            floatingTimeout = null;
+          }
+          
+          if (animation) {
+            animation.kill();
+            animation = null;
+          }
+          
+          contentRef.value.classList.remove('visible');
+          
+          if (wrapperRef.value) {
+            gsap.to(wrapperRef.value, {
               y: -50,
               opacity: 0,
               scale: 0.95,
               duration: 0.6,
-              ease: "power2.in",
-              onComplete: () => {
-                contentRef.value.parentElement.classList.remove('visible');
-              }
+              ease: "power2.in"
             });
           }
         }
@@ -143,37 +185,58 @@ export default {
     };
 
     const startFloatingAnimation = () => {
-      if (animation) animation.kill();
+      // Убиваем предыдущую анимацию если она есть
+      if (animation) {
+        animation.kill();
+        animation = null;
+      }
+      
+      if (!wrapperRef.value) return;
 
       const direction = props.position === 'left' ? 1 : props.position === 'right' ? -1 : 0;
-      const amplitude = 15;
-      const duration = 3;
+      // Простая и надежная анимация
+      const amplitude = 3; // Очень маленькое движение
+      const duration = 4; // Разумная скорость
 
+      // Плавная циклическая анимация без разрывов
       animation = gsap.timeline({
         repeat: -1,
-        defaults: { duration: duration, ease: "sine.inOut" }
+        yoyo: true, // Автоматический плавный возврат
+        ease: "sine.inOut" // Мягкий синусоидальный easing
       });
 
-      // Синхронизированная анимация для всех карточек
-      animation
-        .to(offset.value, {
-          x: amplitude * direction,
-          y: -amplitude,
-          duration: duration / 2,
-        })
-        .to(offset.value, {
-          x: 0,
-          y: 0,
-          duration: duration / 2,
-        });
+      animation.to(wrapperRef.value, {
+        x: amplitude * direction,
+        y: -amplitude * 0.3,
+        duration: duration / 2,
+        ease: "sine.inOut", // Плавный переход
+        force3D: true
+      });
     };
 
     onMounted(() => {
       const cleanup = initFloating();
-      return () => {
+      
+      // Cleanup при unmount
+      onUnmounted(() => {
         cleanup?.();
-        if (animation) animation.kill();
-      };
+        if (animation) {
+          animation.kill();
+          animation = null;
+        }
+        if (hoverAnimation) {
+          hoverAnimation.kill();
+          hoverAnimation = null;
+        }
+        
+        // Cleanup всех ScrollTrigger связанных с этим элементом
+        ScrollTrigger.getAll().forEach(trigger => {
+          if (trigger.trigger === contentRef.value || 
+              trigger.trigger === contentRef.value?.closest('.floating-cards-wrapper')) {
+            trigger.kill();
+          }
+        });
+      });
     });
 
     const handleHover = (isHovering) => {
@@ -182,13 +245,14 @@ export default {
         hoverAnimation = null;
       }
       
-      if (!isVisible.value) return;
+      if (!isVisible.value || !wrapperRef.value) return;
       
-      hoverAnimation = gsap.to(scale, {
+      // Простой и надежный hover эффект
+      hoverAnimation = gsap.to(wrapperRef.value, {
         duration: 0.3,
-        value: isHovering ? 1.05 : 1,
+        scale: isHovering ? 1.02 : 1,
         ease: "power2.out",
-        overwrite: true
+        force3D: true
       });
 
       // Add hover effect to the gradient
@@ -197,14 +261,14 @@ export default {
         gsap.to(gradient, {
           duration: 0.3,
           opacity: isHovering ? 0.2 : 0,
-          ease: "power2.out",
-          overwrite: true
+          ease: "power2.out"
         });
       }
     };
 
     return {
       contentRef,
+      wrapperRef,
       isVisible,
       offset,
       scale,

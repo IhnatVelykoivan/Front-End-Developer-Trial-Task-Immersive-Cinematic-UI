@@ -533,3 +533,45 @@ section::after {
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform, opacity;
 }
+
+/* Performance optimizations for low-end devices */
+.low-performance .content-wrapper::before {
+    backdrop-filter: blur(4px) !important;
+}
+
+.low-performance .animate-float-slow {
+    animation-duration: 30s !important;
+}
+
+.low-performance .animate-float-medium {
+    animation-duration: 25s !important;
+}
+
+.low-performance .animate-float-fast {
+    animation-duration: 20s !important;
+}
+
+/* Only disable very expensive animations on low-performance */
+.low-performance .animate-glow {
+    animation-duration: 15s !important;
+}
+
+/* Reduced motion preferences - более избирательный подход */
+@media (prefers-reduced-motion: reduce) {
+    .floating-content,
+    .content-wrapper,
+    .scroll-to-top-btn {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.3s !important;
+    }
+    
+    /* Сохраняем фоновые анимации, но делаем их медленнее */
+    .animate-gradient,
+    .animate-float-slow,
+    .animate-float-medium,
+    .animate-float-fast,
+    .animate-glow {
+        animation-duration: 60s !important;
+    }
+}

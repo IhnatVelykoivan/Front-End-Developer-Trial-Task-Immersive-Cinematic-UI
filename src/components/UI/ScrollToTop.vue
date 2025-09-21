@@ -92,12 +92,23 @@ export default {
     }
 
     onMounted(() => {
-      window.addEventListener('scroll', handleScroll, { passive: true })
-      handleScroll() // Первоначальная проверка
+      // Используем passive listeners для лучшей производительности
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      handleScroll(); // Первоначальная проверка
     })
 
     onUnmounted(() => {
-      window.removeEventListener('scroll', handleScroll)
+      // Убираем event listener
+      window.removeEventListener('scroll', handleScroll);
+      
+      // Очищаем все возможные анимации
+      if (isVisible.value) {
+        // Останавливаем любые активные CSS анимации
+        const btn = document.querySelector('.scroll-to-top-btn');
+        if (btn) {
+          btn.style.animation = 'none';
+        }
+      }
     })
 
     return {

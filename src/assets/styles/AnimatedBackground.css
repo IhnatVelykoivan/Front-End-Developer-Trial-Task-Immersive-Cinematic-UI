@@ -69,26 +69,32 @@
 .animate-gradient {
     background-size: 400% 400%;
     animation: gradient 15s ease infinite;
+    animation-play-state: running !important;
 }
 
 .animate-float-slow {
     animation: float-slow 20s ease-in-out infinite;
+    animation-play-state: running !important;
 }
 
 .animate-float-medium {
     animation: float-medium 15s ease-in-out infinite;
+    animation-play-state: running !important;
 }
 
 .animate-float-fast {
     animation: float-fast 10s ease-in-out infinite;
+    animation-play-state: running !important;
 }
 
 .animate-pulse-slow {
     animation: pulse-slow 8s ease-in-out infinite;
+    animation-play-state: running !important;
 }
 
 .animate-glow {
     animation: glow 10s ease-in-out infinite;
+    animation-play-state: running !important;
 }
 
 /* Мобильная адаптация */

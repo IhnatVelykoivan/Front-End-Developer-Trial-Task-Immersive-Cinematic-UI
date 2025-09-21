@@ -6,6 +6,42 @@ export const useParticles = (canvasRef) => {
     let ctx;
     let mouse = { x: 0, y: 0, radius: 150 };
     let hue = 0;
+    
+    // Performance throttling
+    let targetFPS = 60;
+    let frameInterval = 1000 / targetFPS;
+    let lastFrameTime = 0;
+    let fpsCounter = 0;
+    let lastFPSCheck = Date.now();
+    
+    // Adaptive performance mode
+    let performanceMode = 'auto'; // auto, high, medium, low
+
+    const updatePerformanceMode = () => {
+        fpsCounter++;
+        const now = Date.now();
+        
+        if (now - lastFPSCheck >= 1000) {
+            const currentFPS = fpsCounter;
+            fpsCounter = 0;
+            lastFPSCheck = now;
+            
+            // Автоматическое переключение режима производительности
+            if (currentFPS < 30) {
+                performanceMode = 'low';
+                targetFPS = 30;
+                frameInterval = 1000 / targetFPS;
+            } else if (currentFPS < 50) {
+                performanceMode = 'medium';
+                targetFPS = 45;
+                frameInterval = 1000 / targetFPS;
+            } else {
+                performanceMode = 'high';
+                targetFPS = 60;
+                frameInterval = 1000 / targetFPS;
+            }
+        }
+    };
 
     const initParticles = () => {
         if (!canvasRef.value) return;
@@ -31,10 +67,20 @@ export const useParticles = (canvasRef) => {
         // Масштабируем контекст
         ctx.scale(dpr, dpr);
 
-        // Адаптивное количество частиц в зависимости от размера экрана
+        // Адаптивное количество частиц в зависимости от размера экрана и производительности
         const baseParticleCount = 100; // базовое количество для экрана 1920x1080
         const screenRatio = (screenWidth * screenHeight) / (1920 * 1080);
-        const particleCount = Math.min(150, Math.floor(baseParticleCount * screenRatio));
+        let particleCount = Math.min(150, Math.floor(baseParticleCount * screenRatio));
+        
+        // Дополнительная оптимизация для мобильных устройств
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            particleCount = Math.floor(particleCount * 0.6);
+        }
+        
+        // Уменьшение количества частиц для слабых устройств
+        if (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4) {
+            particleCount = Math.floor(particleCount * 0.7);
+        }
         
         for (let i = 0; i < particleCount; i++) {
             const particle = {
@@ -52,6 +98,27 @@ export const useParticles = (canvasRef) => {
         }
 
         animateParticles();
+        
+        // Intersection Observer для остановки анимации когда canvas не видно
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (!animationId) {
+                        animateParticles();
+                    }
+                } else {
+                    if (animationId) {
+                        cancelAnimationFrame(animationId);
+                        animationId = null;
+                    }
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        observer.observe(canvasRef.value);
+        
+        // Сохраняем observer для cleanup
+        canvasRef.value._observer = observer;
     };
 
     const handleMouseMove = (event) => {
@@ -97,10 +164,32 @@ export const useParticles = (canvasRef) => {
         });
     };
 
-    const animateParticles = () => {
-        ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
+    const animateParticles = (currentTime) => {
+        // FPS throttling
+        if (currentTime - lastFrameTime < frameInterval) {
+            animationId = requestAnimationFrame(animateParticles);
+            return;
+        }
         
-        particles.forEach(particle => {
+        updatePerformanceMode();
+        lastFrameTime = currentTime;
+        
+        // Performance-based rendering optimizations
+        const particleUpdateStep = performanceMode === 'low' ? 2 : 1;
+        const clearAlpha = performanceMode === 'low' ? 0.1 : 1;
+        
+        // More efficient clearing for low performance mode
+        if (performanceMode === 'low') {
+            ctx.fillStyle = `rgba(0, 0, 0, ${clearAlpha})`;
+            ctx.fillRect(0, 0, canvasRef.value.width, canvasRef.value.height);
+        } else {
+            ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
+        }
+        
+        // Update and render particles with performance optimization
+        for (let i = 0; i < particles.length; i += particleUpdateStep) {
+            const particle = particles[i];
+            
             // Обновляем позицию
             particle.x += particle.velocity.x;
             particle.y += particle.velocity.y;
@@ -116,7 +205,7 @@ export const useParticles = (canvasRef) => {
             ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
             ctx.fillStyle = particle.color;
             ctx.fill();
-        });
+        }
 
         animationId = requestAnimationFrame(animateParticles);
     };
@@ -124,7 +213,15 @@ export const useParticles = (canvasRef) => {
     const stopParticles = () => {
         if (animationId) {
             cancelAnimationFrame(animationId);
+            animationId = null;
         }
+        
+        // Cleanup intersection observer
+        if (canvasRef.value && canvasRef.value._observer) {
+            canvasRef.value._observer.disconnect();
+            canvasRef.value._observer = null;
+        }
+        
         particles = [];
     };
 

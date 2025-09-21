@@ -59,25 +59,31 @@ export default {
     }
   },
   mounted() {
+    // Простая инициализация - показываем все карточки через небольшую задержку
+    this.$nextTick(() => {
+      const cards = this.$el.querySelectorAll('.floating-card');
+      cards.forEach((card, index) => {
+        setTimeout(() => {
+          card.classList.add('visible');
+        }, index * 200);
+      });
+    });
+
     // Создаем IntersectionObserver для отслеживания видимости секции
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           // Если секция видима, добавляем класс visible всем карточкам
-          entry.target.querySelectorAll('.floating-card').forEach((card, index) => {
+          const cards = entry.target.querySelectorAll('.floating-card');
+          cards.forEach((card, index) => {
             setTimeout(() => {
               card.classList.add('visible');
-            }, index * 150); // Увеличенная задержка для более плавной анимации
+            }, index * 150);
           });
-        } else {
-          // Удаляем класс visible при выходе из области видимости (опционально)
-          // entry.target.querySelectorAll('.floating-card').forEach(card => {
-          //   card.classList.remove('visible');
-          // });
         }
       });
     }, {
-      threshold: 0.3 // Увеличенный порог срабатывания
+      threshold: 0.2
     });
 
     // Начинаем наблюдение за секцией

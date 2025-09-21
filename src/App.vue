@@ -92,6 +92,7 @@ import ContentSection from './components/Sections/ContentSection.vue';
 import ImageSection from './components/Sections/ImageSection.vue';
 import AppFooter from './components/Layout/AppFooter.vue';
 import { useParallax } from './composables/useParallax';
+import { usePerformance } from './composables/usePerformance';
 
 export default {
   name: 'App',
@@ -107,6 +108,7 @@ export default {
   },
   setup() {
     const { initParallax } = useParallax();
+    const { optimizeAnimations, performanceMode } = usePerformance();
 
     const content1 = ref([
       'Where innovation meets imagination, creating experiences that transcend the ordinary and venture into the extraordinary.',
@@ -120,6 +122,7 @@ export default {
 
     onMounted(() => {
       initParallax();
+      optimizeAnimations();
     });
 
     return {
