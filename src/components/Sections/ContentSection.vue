@@ -6,9 +6,10 @@
 
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
       <div class="text-block max-w-4xl mx-auto text-center smooth-text relative z-10">
-        <h2 class="text-4xl md:text-5xl font-bold mb-8 fade-in-up">{{ title }}</h2>
+        <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 secondary-glow-text fade-in-up leading-tight">{{ title }}</h2>
+        <div class="w-24 h-0.5 secondary-gradient-line mx-auto mb-8 rounded-full fade-in-up" style="animation-delay: 0.2s"></div>
         <div class="max-w-3xl mx-auto">
-          <p v-for="(paragraph, index) in content" :key="index" class="text-xl md:text-2xl opacity-90 mb-6 leading-relaxed">
+          <p v-for="(paragraph, index) in content" :key="index" class="text-xl md:text-2xl opacity-90 mb-6 leading-relaxed fade-in-up" :style="`animation-delay: ${0.4 + index * 0.1}s`">
             {{ paragraph }}
           </p>
         </div>

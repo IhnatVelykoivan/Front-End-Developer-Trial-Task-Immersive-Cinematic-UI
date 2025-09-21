@@ -64,7 +64,7 @@
                 class="parallax-container image-section"
             >
               <div class="central-content max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 secondary-glow-text fade-in-up leading-tight text-center">
+                <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-12 secondary-glow-text fade-in-up leading-tight text-center">
                   Digital Frontiers
                 </h2>
                 <div class="max-w-3xl mx-auto space-y-6 text-center">
