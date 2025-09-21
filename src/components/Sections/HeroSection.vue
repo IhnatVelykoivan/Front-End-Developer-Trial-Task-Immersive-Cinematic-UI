@@ -1,7 +1,7 @@
 <template>
-  <section id="home" class="h-screen flex flex-col justify-center items-center text-center relative overflow-hidden section-gradient">
+  <section id="home" class="h-screen flex flex-col justify-center items-center text-center relative overflow-hidden" style="padding-top: 80px;">
     <div class="absolute inset-0 parallax-bg opacity-30 parallax-layer-1">
-      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/20 to-black/90 backdrop-blur-[2px]"></div>
+      <!-- Убираем градиентный overlay -->
     </div>
 
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
@@ -13,28 +13,45 @@
           <p class="text-xl md:text-2xl lg:text-3xl mb-10 opacity-90 fade-in-up gpu-accelerated leading-relaxed" style="animation-delay: 0.2s">
             Pushing beyond the boundaries of imagination into uncharted territories of digital experience
           </p>
+          
+          <!-- Кнопка навигации к About секции -->
+          <div class="flex justify-center mb-8 fade-in-up" style="animation-delay: 0.3s">
+            <button 
+              @click="navigateToAbout"
+              class="hero-explore-btn group relative overflow-hidden"
+            >
+              <span class="relative z-10 flex items-center gap-3">
+                Explore Journey
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="transition-transform group-hover:translate-x-1">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </span>
+              <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </button>
+          </div>
+          
           <div class="w-40 h-1 hero-gradient-line mx-auto mt-8 rounded-full fade-in-up" style="animation-delay: 0.4s"></div>
         </div>
       </div>
     </div>
 
-    <div class="absolute bottom-0 left-0 w-full h-1/2 pointer-events-none">
-      <div class="relative h-full">
-        <div class="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-black via-black/50 to-transparent"></div>
-        <div class="absolute bottom-0 left-0 w-full flex justify-center items-center pb-16">
-          <ScrollIndicator class="fade-in-up transform-gpu" style="animation-delay: 0.4s" />
-        </div>
-      </div>
-    </div>
+    <!-- Убираем нижний градиент -->
   </section>
 </template>
 
 <script>
-import ScrollIndicator from '../UI/ScrollIndicator.vue';
-
 export default {
   name: 'HeroSection',
-  components: { ScrollIndicator }
+  emits: ['navigate-to-about'],
+  setup(props, { emit }) {
+    const navigateToAbout = () => {
+      emit('navigate-to-about');
+    };
+
+    return {
+      navigateToAbout
+    };
+  }
 };
 </script>
 

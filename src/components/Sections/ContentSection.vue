@@ -1,7 +1,7 @@
 <template>
-  <section :id="id" class="min-h-screen flex flex-col items-center justify-center py-20 relative overflow-hidden section-gradient">
+  <section :id="id" class="min-h-screen flex flex-col items-center justify-center py-20 relative overflow-hidden">
+    <!-- Убираем градиентный overlay -->
     <div class="absolute inset-0 opacity-10 parallax-layer-1">
-      <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-blue-500/10"></div>
     </div>
 
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">

@@ -1,6 +1,6 @@
 <template>
-  <footer :id="id" class="relative py-20 text-center section-gradient overflow-hidden footer-section">
-    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+  <footer :id="id" class="relative py-20 text-center overflow-hidden footer-section">
+    <!-- Убираем градиент для единого фона -->
     <div class="relative z-10 container mx-auto px-4">
       <p class="text-white/80 footer-text">© 2023 Zero Limits Experience</p>
     </div>

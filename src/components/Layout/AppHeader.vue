@@ -1,10 +1,14 @@
 <template>
-  <header class="fixed top-0 left-0 right-0 z-50 cinematic-nav" :class="{ 'nav-scrolled': isScrolled }">
+  <header 
+    class="fixed top-0 left-0 right-0 cinematic-nav" 
+    :class="{ 'nav-scrolled': isScrolled }" 
+    style="z-index: 1001 !important; visibility: visible !important; opacity: 1 !important;"
+  >
     <!-- Индикатор прогресса скролла -->
     <div class="scroll-progress-bar" :style="{ width: scrollProgress + '%' }"></div>
     
-    <nav class="w-full max-w-none px-4 sm:px-6 lg:px-8 py-4">
-      <div class="flex items-center justify-between w-full">
+    <nav class="w-full max-w-none px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between w-full h-20">
         <!-- Улучшенный логотип -->
         <div class="logo-container flex-shrink-0">
           <a href="#home" @click="scrollToSection('home')" class="logo-link group">
@@ -37,16 +41,6 @@
           </nav>
         </div>
         
-        <!-- CTA кнопка -->
-        <div class="hidden lg:flex items-center flex-shrink-0">
-          <button class="cta-button group">
-            <span class="cta-text">Get Started</span>
-            <svg class="cta-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 1L15 8L8 15M15 8H1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </div>
-
         <!-- Улучшенная мобильная кнопка меню -->
         <button 
           @click="toggleMobileMenu"
@@ -92,15 +86,6 @@
             @click="handleMobileNavClick(item.id)"
           />
         </nav>
-        
-        <div class="mobile-menu-footer">
-          <button class="mobile-cta-button">
-            <span>Get Started</span>
-            <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-              <path d="M8 1L15 8L8 15M15 8H1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </div>
       </div>
     </div>
   </header>
@@ -133,32 +118,44 @@ export default {
       const scrollTop = window.scrollY
       const docHeight = document.documentElement.scrollHeight - window.innerHeight
       
-      isScrolled.value = scrollTop > 100
+      isScrolled.value = scrollTop > 50
       scrollProgress.value = (scrollTop / docHeight) * 100
       
-      // Улучшенное определение активной секции
-      const sections = document.querySelectorAll('section[id], [id]')
-      const headerOffset = 100 // Отступ для фиксированной навигации
-      
+      // Простая логика определения активной секции
       let currentSection = 'home'
       
-      sections.forEach(section => {
-        const sectionTop = section.offsetTop - headerOffset
-        const sectionHeight = section.offsetHeight
-        const sectionId = section.getAttribute('id')
+      // Если близко к верху - всегда home
+      if (scrollTop < 200) {
+        currentSection = 'home'
+      } else {
+        // Проверяем каждую секцию и находим ближайшую
+        const sections = ['about', 'gallery', 'vision', 'contact']
         
-        if (sectionId && scrollTop >= sectionTop - 100 && scrollTop < sectionTop + sectionHeight - 100) {
-          currentSection = sectionId
+        for (const sectionId of sections) {
+          const element = document.getElementById(sectionId)
+          if (element) {
+            const rect = element.getBoundingClientRect()
+            // Если секция видна на экране (хотя бы частично)
+            if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
+              currentSection = sectionId
+              break
+            }
+          }
         }
-      })
+      }
       
-      activeSection.value = currentSection
+      // Обновляем активную секцию
+      if (activeSection.value !== currentSection) {
+        activeSection.value = currentSection
+      }
     }
 
     const scrollToSection = (sectionId) => {
-      console.log('Прокрутка к секции:', sectionId)
+      console.log('🎯 Header navigation to section:', sectionId)
       
       if (sectionId === 'home') {
+        // Для главной секции - просто в самый верх
+        console.log('📍 Scrolling to top (0)')
         window.scrollTo({
           top: 0,
           behavior: 'smooth'
@@ -167,33 +164,30 @@ export default {
         return
       }
       
+      // Для всех остальных секций используем ту же логику что и в App.vue
       const element = document.getElementById(sectionId)
-      console.log('Найденный элемент:', element)
-      
       if (element) {
-        const headerHeight = 80 // Высота фиксированной навигации
-        const rect = element.getBoundingClientRect()
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-        const elementTop = rect.top + scrollTop
-        const offsetTop = elementTop - headerHeight
+        console.log('🔍 Found element:', sectionId)
         
-        console.log('Элемент находится на позиции:', elementTop)
-        console.log('Прокрутка к позиции с учетом хедера:', offsetTop)
+        // Получаем позицию элемента и прокручиваем точно к началу
+        // (без offset, так как SectionNavigator уже учитывает верхнюю кнопку 10vh)
+        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
+        
+        console.log('📐 Scrolling to position:', elementPosition)
         
         window.scrollTo({
-          top: offsetTop,
+          top: elementPosition,
           behavior: 'smooth'
         })
         
-        // Обновляем активную секцию
         activeSection.value = sectionId
         
-        // Закрываем мобильное меню если оно открыто
+        // Закрываем мобильное меню если открыто
         if (isMobileMenuOpen.value) {
           isMobileMenuOpen.value = false
         }
       } else {
-        console.error('Секция не найдена:', sectionId)
+        console.error('❌ Секция не найдена:', sectionId)
       }
     }
 

@@ -49,10 +49,18 @@ export default {
     const scale = ref(1);
     let animation;
     let hoverAnimation;
-    let floatingTimeout; // Добавляем переменную для таймаута
 
     const initFloating = () => {
       if (!contentRef.value) return;
+
+      // Устанавливаем начальное скрытое состояние для wrapper
+      if (wrapperRef.value) {
+        gsap.set(wrapperRef.value, {
+          y: 50,
+          opacity: 0,
+          scale: 0.95
+        });
+      }
 
       const trigger = ScrollTrigger.create({
         trigger: contentRef.value,
@@ -61,12 +69,6 @@ export default {
         toggleActions: "play none none reverse",
         onEnter: () => {
           isVisible.value = true;
-          
-          // Отменяем предыдущий таймаут если есть
-          if (floatingTimeout) {
-            clearTimeout(floatingTimeout);
-            floatingTimeout = null;
-          }
           
           // Добавляем класс visible к самому элементу
           contentRef.value.classList.add('visible');
@@ -87,26 +89,17 @@ export default {
                 opacity: 1,
                 scale: 1,
                 duration: 0.8,
-                ease: "power2.out"
+                ease: "power2.out",
+                onComplete: () => {
+                  // Запускаем floating ПОСЛЕ завершения входной анимации
+                  startFloatingAnimation();
+                }
               }
             );
           }
-          
-          // Запускаем floating с задержкой, чтобы не конфликтовало
-          floatingTimeout = setTimeout(() => {
-            if (isVisible.value) { // Проверяем, что блок все еще видим
-              startFloatingAnimation();
-            }
-          }, 900); // После завершения входной анимации
         },
         onLeave: () => {
           isVisible.value = false;
-          
-          // Отменяем таймаут floating анимации
-          if (floatingTimeout) {
-            clearTimeout(floatingTimeout);
-            floatingTimeout = null;
-          }
           
           if (animation) {
             animation.kill();
@@ -128,12 +121,6 @@ export default {
         onEnterBack: () => {
           isVisible.value = true;
           
-          // Отменяем предыдущий таймаут если есть
-          if (floatingTimeout) {
-            clearTimeout(floatingTimeout);
-            floatingTimeout = null;
-          }
-          
           contentRef.value.classList.add('visible');
           
           if (wrapperRef.value) {
@@ -142,25 +129,16 @@ export default {
               opacity: 1,
               scale: 1,
               duration: 0.8,
-              ease: "power2.out"
+              ease: "power2.out",
+              onComplete: () => {
+                // Запускаем floating ПОСЛЕ завершения входной анимации
+                startFloatingAnimation();
+              }
             });
           }
-          
-          // Запускаем floating с задержкой, чтобы не конфликтовало
-          floatingTimeout = setTimeout(() => {
-            if (isVisible.value) { // Проверяем, что блок все еще видим
-              startFloatingAnimation();
-            }
-          }, 900); // После завершения входной анимации
         },
         onLeaveBack: () => {
           isVisible.value = false;
-          
-          // Отменяем таймаут floating анимации
-          if (floatingTimeout) {
-            clearTimeout(floatingTimeout);
-            floatingTimeout = null;
-          }
           
           if (animation) {
             animation.kill();
@@ -180,6 +158,29 @@ export default {
           }
         }
       });
+
+      // Проверяем сразу после создания триггера, если элемент уже в видимости
+      setTimeout(() => {
+        trigger.refresh(); // Обновляем триггер
+        if (trigger.isActive) {
+          // Если элемент уже в зоне видимости, показываем его
+          isVisible.value = true;
+          contentRef.value.classList.add('visible');
+          
+          if (wrapperRef.value) {
+            gsap.to(wrapperRef.value, {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              duration: 0.8,
+              ease: "power2.out",
+              onComplete: () => {
+                startFloatingAnimation();
+              }
+            });
+          }
+        }
+      }, 100);
 
       return () => trigger.kill();
     };

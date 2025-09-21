@@ -1,5 +1,5 @@
 <template>
-  <div :id="id" class="w-full h-screen relative overflow-hidden parallax-container section-gradient">
+  <div :id="id" class="w-full h-screen relative overflow-hidden parallax-container">
     <!-- Основное изображение с параллакс эффектом -->
     <div
       class="absolute inset-0 bg-cover bg-center scale-in transform-gpu"

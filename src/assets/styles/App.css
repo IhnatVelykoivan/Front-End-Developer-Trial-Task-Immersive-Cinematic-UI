@@ -5,43 +5,6 @@
 @tailwind utilities;
 
 @layer base {
-  .section-gradient {
-    position: relative;
-  }
-  
-  .section-gradient::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 30vh;
-    background: linear-gradient(to bottom, 
-      transparent 0%,
-      rgba(0, 0, 0, 0.2) 20%,
-      rgba(0, 0, 0, 0.4) 40%,
-      rgba(0, 0, 0, 0.8) 80%,
-      rgb(0, 0, 0) 100%
-    );
-    pointer-events: none;
-  }
-
-  .section-gradient::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: 30vh;
-    background: linear-gradient(to top, 
-      transparent 0%,
-      rgba(0, 0, 0, 0.2) 20%,
-      rgba(0, 0, 0, 0.4) 40%,
-      rgba(0, 0, 0, 0.8) 80%,
-      rgb(0, 0, 0) 100%
-    );
-    pointer-events: none;
-  }
 }
 
 * {
@@ -52,6 +15,14 @@ body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    background: linear-gradient(135deg, 
+        #0f0f23 0%, 
+        #1e1e3f 25%, 
+        #2d2d5a 50%, 
+        #3a3a6b 75%, 
+        #4a4a7c 100%
+    );
+    min-height: 100vh;
 }
 
 /* Контейнеры и выравнивание */
@@ -61,6 +32,16 @@ body {
     margin-right: auto;
     padding-left: 1rem;
     padding-right: 1rem;
+}
+
+/* Плавные переходы между секциями */
+.section-navigator {
+    position: relative;
+}
+
+/* Плавные переходы между секциями */
+.section-navigator {
+    position: relative;
 }
 
 @media (min-width: 640px) {
@@ -158,10 +139,9 @@ section {
 
 body {
     font-family: 'Inter', sans-serif;
-    background-color: #000;
+    /* Убираем черный фон и переход, который конфликтует с градиентом */
     color: #fff;
     overflow-x: hidden;
-    transition: background-color 1s ease;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     will-change: transform;

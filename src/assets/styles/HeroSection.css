@@ -50,6 +50,43 @@
     }
 }
 
+/* Стили для кнопки Explore Journey */
+.hero-explore-btn {
+    position: relative;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 14px 32px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.hero-explore-btn:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+}
+
+.hero-explore-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Мобильная адаптация для кнопки */
+@media (max-width: 768px) {
+    .hero-explore-btn {
+        padding: 12px 24px;
+        font-size: 14px;
+    }
+}
+
 @media (max-width: 480px) {
     .hero-section {
         padding: 1.5rem 0.75rem;
