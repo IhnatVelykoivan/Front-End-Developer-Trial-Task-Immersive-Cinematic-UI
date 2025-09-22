@@ -1,20 +1,16 @@
-# 🎬 Immersive Cinematic UI - Отчет о развертывании# 🎬 Immersive Cinematic UI - Отчет о развертывании# Front-End Developer Trial Task: Immersive Cinematic UI
-
-
+# 🎬 Immersive Cinematic UI - Отчет о развертывании
 
 ## 📋 Обзор проекта
-
 **Иммерсивный кинематографический пользовательский интерфейс** - современное веб-приложение на Vue.js 3 с продвинутыми анимациями, эффектами параллакса и отзывчивым дизайном.
-
-## 📋 Обзор проекта## Project Overview
 
 ## 🌐 Живые демо-версии
 
-**Иммерсивный кинематографический пользовательский интерфейс** - современное веб-приложение на Vue.js 3 с продвинутыми анимациями, эффектами параллакса и отзывчивым дизайном.
-
 ### 🚀 Основная ссылка для проверки
+**GitHub Pages**: [https://ihnativelykoivan.github.io/Front-End-Developer-Trial-Task-Immersive-Cinematic-UI/](https://ihnativelykoivan.github.io/Front-End-Developer-Trial-Task-Immersive-Cinematic-UI/)
 
-**GitHub Pages**: [https://ihnativelykoivan.github.io/Front-End-Developer-Trial-Task-Immersive-Cinematic-UI/](https://ihnativelykoivan.github.io/Front-End-Developer-Trial-Task-Immersive-Cinematic-UI/)This project showcases a cinematic user interface built with Vue.js. It features CSS animations, canvas particle effects, and modern web technologies to create an engaging visual experience.
+### 🔗 Дополнительные развертывания
+- **⚡ Netlify**: `https://immersive-cinematic-ui.netlify.app/`
+- **🔷 Vercel**: `https://front-end-developer-trial-task-immersive-cinematic-ui.vercel.app/`
 
 
 
