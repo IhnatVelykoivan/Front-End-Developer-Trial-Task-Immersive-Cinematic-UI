@@ -249,6 +249,16 @@ export default {
     onMounted(() => {
       initParallax();
       optimizeAnimations();
+      
+      // Обработка хеша в URL после полной загрузки компонентов
+      setTimeout(() => {
+        const hash = window.location.hash;
+        if (hash && hash.length > 1) {
+          const sectionId = hash.substring(1); // убираем #
+          console.log(`🔗 Found hash in URL: ${sectionId}`);
+          scrollToSection(sectionId);
+        }
+      }, 300); // даем время на полную загрузку компонентов
     });
 
     const navigateToAbout = () => {
