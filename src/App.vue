@@ -165,58 +165,9 @@ export default {
     // Порядок секций для навигации
     const sectionOrder = ['home', 'about', 'gallery', 'vision', 'contact'];
 
-    // Блокировка скролла во время инициализации
-    const blockScroll = () => {
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
-      console.log('🚫 Scroll blocked during initialization');
-    };
-
-    const unblockScroll = () => {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-      console.log('✅ Scroll unblocked');
-    };
-
-    // Агрессивный перехват и сохранение состояния
-    const saveCurrentState = () => {
-      const currentScrollY = window.pageYOffset;
-      const hash = window.location.hash;
-      
-      if (hash && hash.length > 1) {
-        sessionStorage.setItem('targetSection', hash.substring(1));
-        console.log(`💾 Saved target section: ${hash.substring(1)}`);
-      } else if (currentScrollY > 100) {
-        // Определяем секцию по позиции скролла
-        const sections = ['about', 'gallery', 'vision', 'contact'];
-        for (const sectionId of sections) {
-          const element = document.getElementById(sectionId);
-          if (element) {
-            const rect = element.getBoundingClientRect();
-            const elementTop = rect.top + currentScrollY;
-            const elementBottom = elementTop + element.offsetHeight;
-            
-            if (currentScrollY >= elementTop - 200 && currentScrollY < elementBottom) {
-              sessionStorage.setItem('targetSection', sectionId);
-              console.log(`💾 Saved section by scroll position: ${sectionId}`);
-              break;
-            }
-          }
-        }
-      }
-    };
-
-    // Немедленная блокировка скролла при загрузке
-    if (typeof window !== 'undefined') {
-      blockScroll();
-      
-      // Отключаем автоматическое восстановление скролла
-      if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'manual';
-      }
-      
-      // Сохраняем состояние перед выгрузкой
-      window.addEventListener('beforeunload', saveCurrentState);
+    // Отключаем автоматическое восстановление скролла на уровне истории браузера
+    if (typeof window !== 'undefined' && 'scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
     }
 
     const scrollToSection = (sectionId) => {
@@ -319,77 +270,31 @@ export default {
     };
 
     onMounted(() => {
-      console.log('🚀 App mounted, starting aggressive Chrome fix...');
+      console.log('🚀 App mounted - simple Home redirect...');
       
-      // Принудительно сбрасываем скролл к верху НЕМЕДЛЕННО
+      // 🏠 ПРОСТОЕ РЕШЕНИЕ: При любой перезагрузке всегда идем на Home
+      // Игнорируем все хеши и сохраненные состояния
+      
+      // Блокируем Chrome восстановление скролла
+      if (history.scrollRestoration) {
+        history.scrollRestoration = 'manual';
+      }
+      
+      // Принудительно идем на главную
       window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
       
+      // Убираем любой хеш из URL
+      if (window.location.hash) {
+        window.history.replaceState(null, null, window.location.pathname);
+      }
+      
+      // Инициализируем эффекты
       initParallax();
       optimizeAnimations();
       
-      // Проверяем сохраненное состояние или хеш
-      const savedSection = sessionStorage.getItem('targetSection');
-      const currentHash = window.location.hash;
-      let targetSection = null;
-      
-      if (savedSection) {
-        targetSection = savedSection;
-        console.log(`📋 Found saved section: ${targetSection}`);
-        sessionStorage.removeItem('targetSection');
-      } else if (currentHash && currentHash.length > 1) {
-        targetSection = currentHash.substring(1);
-        console.log(`🔗 Found hash: ${targetSection}`);
-      }
-      
-      // Агрессивная инициализация с блокировкой
-      setTimeout(() => {
-        // Принудительно удерживаем позицию в верху
-        window.scrollTo(0, 0);
-        
-        if (targetSection && targetSection !== 'home') {
-          console.log(`🎯 Navigating to target: ${targetSection}`);
-          
-          // Обновляем хеш без перехода
-          window.history.replaceState(null, null, `#${targetSection}`);
-          
-          // Ждем еще немного для полной стабилизации
-          setTimeout(() => {
-            window.scrollTo(0, 0); // Еще раз сбрасываем
-            
-            setTimeout(() => {
-              scrollToSection(targetSection);
-              
-              // Разблокируем скролл через время
-              setTimeout(() => {
-                unblockScroll();
-              }, 200);
-            }, 100);
-          }, 100);
-        } else {
-          // Если целевая секция - home или не задана
-          setTimeout(() => {
-            unblockScroll();
-          }, 200);
-        }
-      }, 700); // Увеличиваем задержку для гарантии
-      
-      // Дополнительная защита - следим за попытками скролла Chrome
-      let scrollAttempts = 0;
-      const maxScrollAttempts = 10;
-      
-      const preventChromeRestore = () => {
-        if (scrollAttempts < maxScrollAttempts && window.pageYOffset > 50) {
-          console.log(`🛡️ Chrome tried to restore scroll, blocking attempt ${scrollAttempts + 1}`);
-          window.scrollTo(0, 0);
-          scrollAttempts++;
-          
-          // Продолжаем следить
-          setTimeout(preventChromeRestore, 50);
-        }
-      };
-      
-      // Запускаем защиту
-      setTimeout(preventChromeRestore, 100);
+      console.log('✅ Always redirected to Home - simple and stable!');
     });
 
     const navigateToAbout = () => {
