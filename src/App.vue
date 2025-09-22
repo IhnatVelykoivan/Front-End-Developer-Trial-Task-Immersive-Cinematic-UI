@@ -165,6 +165,60 @@ export default {
     // Порядок секций для навигации
     const sectionOrder = ['home', 'about', 'gallery', 'vision', 'contact'];
 
+    // Блокировка скролла во время инициализации
+    const blockScroll = () => {
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      console.log('🚫 Scroll blocked during initialization');
+    };
+
+    const unblockScroll = () => {
+      document.body.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      console.log('✅ Scroll unblocked');
+    };
+
+    // Агрессивный перехват и сохранение состояния
+    const saveCurrentState = () => {
+      const currentScrollY = window.pageYOffset;
+      const hash = window.location.hash;
+      
+      if (hash && hash.length > 1) {
+        sessionStorage.setItem('targetSection', hash.substring(1));
+        console.log(`💾 Saved target section: ${hash.substring(1)}`);
+      } else if (currentScrollY > 100) {
+        // Определяем секцию по позиции скролла
+        const sections = ['about', 'gallery', 'vision', 'contact'];
+        for (const sectionId of sections) {
+          const element = document.getElementById(sectionId);
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            const elementTop = rect.top + currentScrollY;
+            const elementBottom = elementTop + element.offsetHeight;
+            
+            if (currentScrollY >= elementTop - 200 && currentScrollY < elementBottom) {
+              sessionStorage.setItem('targetSection', sectionId);
+              console.log(`💾 Saved section by scroll position: ${sectionId}`);
+              break;
+            }
+          }
+        }
+      }
+    };
+
+    // Немедленная блокировка скролла при загрузке
+    if (typeof window !== 'undefined') {
+      blockScroll();
+      
+      // Отключаем автоматическое восстановление скролла
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+      
+      // Сохраняем состояние перед выгрузкой
+      window.addEventListener('beforeunload', saveCurrentState);
+    }
+
     const scrollToSection = (sectionId) => {
       console.log(`🎯 scrollToSection called with: ${sectionId}`);
       
@@ -265,86 +319,77 @@ export default {
     };
 
     onMounted(() => {
+      console.log('🚀 App mounted, starting aggressive Chrome fix...');
+      
+      // Принудительно сбрасываем скролл к верху НЕМЕДЛЕННО
+      window.scrollTo(0, 0);
+      
       initParallax();
       optimizeAnimations();
       
-      // Отключаем автоматическое восстановление позиции скролла браузером
-      if ('scrollRestoration' in history) {
-        history.scrollRestoration = 'manual';
-        console.log('📜 Browser scroll restoration disabled');
+      // Проверяем сохраненное состояние или хеш
+      const savedSection = sessionStorage.getItem('targetSection');
+      const currentHash = window.location.hash;
+      let targetSection = null;
+      
+      if (savedSection) {
+        targetSection = savedSection;
+        console.log(`📋 Found saved section: ${targetSection}`);
+        sessionStorage.removeItem('targetSection');
+      } else if (currentHash && currentHash.length > 1) {
+        targetSection = currentHash.substring(1);
+        console.log(`🔗 Found hash: ${targetSection}`);
       }
       
-      // Сохраняем текущую позицию скролла для анализа
-      const initialScrollPosition = window.pageYOffset;
-      console.log(`📍 Initial scroll position: ${initialScrollPosition}`);
-      
-      // Определяем текущую секцию по позиции скролла
-      const determineCurrentSectionByScroll = (scrollY) => {
-        console.log(`🔍 Determining section for scroll position: ${scrollY}`);
+      // Агрессивная инициализация с блокировкой
+      setTimeout(() => {
+        // Принудительно удерживаем позицию в верху
+        window.scrollTo(0, 0);
         
-        if (scrollY < 200) {
-          return 'home';
-        }
-        
-        const sections = ['about', 'gallery', 'vision', 'contact'];
-        for (const sectionId of sections) {
-          const element = document.getElementById(sectionId);
-          if (element) {
-            const rect = element.getBoundingClientRect();
-            const elementTop = rect.top + scrollY;
-            const elementBottom = elementTop + element.offsetHeight;
+        if (targetSection && targetSection !== 'home') {
+          console.log(`🎯 Navigating to target: ${targetSection}`);
+          
+          // Обновляем хеш без перехода
+          window.history.replaceState(null, null, `#${targetSection}`);
+          
+          // Ждем еще немного для полной стабилизации
+          setTimeout(() => {
+            window.scrollTo(0, 0); // Еще раз сбрасываем
             
-            // Если позиция скролла находится в пределах секции
-            if (scrollY >= elementTop - 100 && scrollY < elementBottom) {
-              console.log(`✅ Found section: ${sectionId} (${elementTop} - ${elementBottom})`);
-              return sectionId;
-            }
-          }
+            setTimeout(() => {
+              scrollToSection(targetSection);
+              
+              // Разблокируем скролл через время
+              setTimeout(() => {
+                unblockScroll();
+              }, 200);
+            }, 100);
+          }, 100);
+        } else {
+          // Если целевая секция - home или не задана
+          setTimeout(() => {
+            unblockScroll();
+          }, 200);
         }
-        
-        return 'home';
+      }, 700); // Увеличиваем задержку для гарантии
+      
+      // Дополнительная защита - следим за попытками скролла Chrome
+      let scrollAttempts = 0;
+      const maxScrollAttempts = 10;
+      
+      const preventChromeRestore = () => {
+        if (scrollAttempts < maxScrollAttempts && window.pageYOffset > 50) {
+          console.log(`🛡️ Chrome tried to restore scroll, blocking attempt ${scrollAttempts + 1}`);
+          window.scrollTo(0, 0);
+          scrollAttempts++;
+          
+          // Продолжаем следить
+          setTimeout(preventChromeRestore, 50);
+        }
       };
       
-      // Обработка восстановленной позиции скролла или хеша
-      setTimeout(() => {
-        const hash = window.location.hash;
-        const currentScrollY = window.pageYOffset;
-        
-        console.log(`🎯 Processing navigation - Hash: ${hash}, ScrollY: ${currentScrollY}`);
-        
-        // Если есть хеш в URL
-        if (hash && hash.length > 1) {
-          const sectionId = hash.substring(1);
-          console.log(`🔗 Found hash in URL: ${sectionId}`);
-          
-          // Принудительно сбрасываем скролл к верху
-          window.scrollTo(0, 0);
-          
-          // Даем время на сброс и переходим к нужной секции
-          setTimeout(() => {
-            scrollToSection(sectionId);
-          }, 100);
-        } 
-        // Если браузер восстановил позицию скролла (без хеша)
-        else if (currentScrollY > 100) {
-          console.log(`🔄 Browser restored scroll position: ${currentScrollY}`);
-          
-          // Определяем секцию по позиции
-          const targetSection = determineCurrentSectionByScroll(currentScrollY);
-          console.log(`🎯 Target section for position: ${targetSection}`);
-          
-          // Сбрасываем скролл и переходим к правильной секции
-          window.scrollTo(0, 0);
-          
-          setTimeout(() => {
-            if (targetSection !== 'home') {
-              // Обновляем хеш для соответствия
-              window.location.hash = `#${targetSection}`;
-            }
-            scrollToSection(targetSection);
-          }, 100);
-        }
-      }, 600); // увеличиваем задержку для стабильности
+      // Запускаем защиту
+      setTimeout(preventChromeRestore, 100);
     });
 
     const navigateToAbout = () => {
