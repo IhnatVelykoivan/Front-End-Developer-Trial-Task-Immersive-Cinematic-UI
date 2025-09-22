@@ -124,7 +124,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import ParticleCanvas from './components/UI/ParticleCanvas.vue';
 // AnimatedBackground убран для чистого фона
 import SectionNavigator from './components/UI/SectionNavigator.vue';
@@ -268,31 +268,81 @@ export default {
       initParallax();
       optimizeAnimations();
       
-      // Обработка хеша в URL после полной загрузки компонентов
-      // Увеличиваем задержку для гарантии полной инициализации всех компонентов и стилей
-      setTimeout(() => {
-        const hash = window.location.hash;
-        if (hash && hash.length > 1) {
-          const sectionId = hash.substring(1); // убираем #
-          console.log(`🔗 Found hash in URL: ${sectionId}`);
-          
-          // Дополнительная проверка что элемент существует и готов
+      // Отключаем автоматическое восстановление позиции скролла браузером
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+        console.log('📜 Browser scroll restoration disabled');
+      }
+      
+      // Сохраняем текущую позицию скролла для анализа
+      const initialScrollPosition = window.pageYOffset;
+      console.log(`📍 Initial scroll position: ${initialScrollPosition}`);
+      
+      // Определяем текущую секцию по позиции скролла
+      const determineCurrentSectionByScroll = (scrollY) => {
+        console.log(`🔍 Determining section for scroll position: ${scrollY}`);
+        
+        if (scrollY < 200) {
+          return 'home';
+        }
+        
+        const sections = ['about', 'gallery', 'vision', 'contact'];
+        for (const sectionId of sections) {
           const element = document.getElementById(sectionId);
           if (element) {
-            // Принудительно сбрасываем скролл к верху перед навигацией
-            window.scrollTo(0, 0);
+            const rect = element.getBoundingClientRect();
+            const elementTop = rect.top + scrollY;
+            const elementBottom = elementTop + element.offsetHeight;
             
-            // Даем еще небольшую паузу для сброса позиции
-            setTimeout(() => {
-              scrollToSection(sectionId);
-            }, 100);
-          } else {
-            console.warn(`Element with id "${sectionId}" not found, waiting...`);
-            // Если элемент не найден, пробуем еще раз через большую задержку
-            setTimeout(() => {
-              scrollToSection(sectionId);
-            }, 500);
+            // Если позиция скролла находится в пределах секции
+            if (scrollY >= elementTop - 100 && scrollY < elementBottom) {
+              console.log(`✅ Found section: ${sectionId} (${elementTop} - ${elementBottom})`);
+              return sectionId;
+            }
           }
+        }
+        
+        return 'home';
+      };
+      
+      // Обработка восстановленной позиции скролла или хеша
+      setTimeout(() => {
+        const hash = window.location.hash;
+        const currentScrollY = window.pageYOffset;
+        
+        console.log(`🎯 Processing navigation - Hash: ${hash}, ScrollY: ${currentScrollY}`);
+        
+        // Если есть хеш в URL
+        if (hash && hash.length > 1) {
+          const sectionId = hash.substring(1);
+          console.log(`🔗 Found hash in URL: ${sectionId}`);
+          
+          // Принудительно сбрасываем скролл к верху
+          window.scrollTo(0, 0);
+          
+          // Даем время на сброс и переходим к нужной секции
+          setTimeout(() => {
+            scrollToSection(sectionId);
+          }, 100);
+        } 
+        // Если браузер восстановил позицию скролла (без хеша)
+        else if (currentScrollY > 100) {
+          console.log(`🔄 Browser restored scroll position: ${currentScrollY}`);
+          
+          // Определяем секцию по позиции
+          const targetSection = determineCurrentSectionByScroll(currentScrollY);
+          console.log(`🎯 Target section for position: ${targetSection}`);
+          
+          // Сбрасываем скролл и переходим к правильной секции
+          window.scrollTo(0, 0);
+          
+          setTimeout(() => {
+            if (targetSection !== 'home') {
+              // Обновляем хеш для соответствия
+              window.location.hash = `#${targetSection}`;
+            }
+            scrollToSection(targetSection);
+          }, 100);
         }
       }, 600); // увеличиваем задержку для стабильности
     });
@@ -300,6 +350,30 @@ export default {
     const navigateToAbout = () => {
       scrollToSection('about');
     };
+
+    // Добавляем обработчик события popstate для корректной работы кнопок назад/вперед
+    const handlePopState = (event) => {
+      console.log('🔙 Browser navigation detected');
+      const hash = window.location.hash;
+      if (hash && hash.length > 1) {
+        const sectionId = hash.substring(1);
+        setTimeout(() => {
+          scrollToSection(sectionId);
+        }, 100);
+      } else {
+        scrollToSection('home');
+      }
+    };
+
+    // Подключаем обработчик при монтировании
+    onMounted(() => {
+      window.addEventListener('popstate', handlePopState);
+    });
+
+    // Отключаем обработчик при размонтировании 
+    onUnmounted(() => {
+      window.removeEventListener('popstate', handlePopState);
+    });
 
     return {
       content1,
