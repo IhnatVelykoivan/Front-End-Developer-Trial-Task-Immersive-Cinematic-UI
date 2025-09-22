@@ -3,7 +3,9 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
     plugins: [vue()],
-    base: '/Front-End-Developer-Trial-Task-Immersive-Cinematic-UI/',
+    base: process.env.NETLIFY === 'true' 
+        ? './' 
+        : '/Front-End-Developer-Trial-Task-Immersive-Cinematic-UI/',
     server: {
         port: 3000,
         historyApiFallback: true
@@ -11,6 +13,14 @@ export default defineConfig({
     build: {
         outDir: 'dist',
         assetsDir: 'assets',
-        sourcemap: false
+        sourcemap: false,
+        rollupOptions: {
+            output: {
+                manualChunks: undefined
+            }
+        }
+    },
+    optimizeDeps: {
+        include: ['vue']
     }
 })

@@ -7,6 +7,22 @@
 
 **🚀 GitHub Pages**: [https://ihnatvelykoivan.github.io/Front-End-Developer-Trial-Task-Immersive-Cinematic-UI/](https://ihnatvelykoivan.github.io/Front-End-Developer-Trial-Task-Immersive-Cinematic-UI/)
 
+## 🚀 Deployment
+
+### For Netlify:
+```bash
+npm run build
+```
+
+### For GitHub Pages:
+```bash
+npm run deploy:github
+```
+
+The project automatically detects the deployment environment and uses the correct base paths:
+- **Netlify**: Uses relative paths (`./`)
+- **GitHub Pages**: Uses absolute paths (`/Front-End-Developer-Trial-Task-Immersive-Cinematic-UI/`)
+
 ---
 
 ## 🛠️ Technical Architecture
