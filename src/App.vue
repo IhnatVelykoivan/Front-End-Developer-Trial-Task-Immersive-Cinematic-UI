@@ -180,17 +180,35 @@ export default {
       const element = document.getElementById(sectionId);
       if (element) {
         console.log(`✅ Found element for: ${sectionId}`);
-        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-        // Прокручиваем точно к началу секции (10vh для верхней кнопки уже учтены в layout)
-        const offsetPosition = elementPosition;
         
-        console.log(`📐 Scrolling to position: ${offsetPosition}`);
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
+        // Ждем, пока браузер не завершит рендеринг
+        requestAnimationFrame(() => {
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+          // Прокручиваем точно к началу секции
+          const offsetPosition = elementPosition;
+          
+          console.log(`📐 Scrolling to position: ${offsetPosition}`);
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
         });
       } else {
         console.log(`❌ Element not found for: ${sectionId}`);
+        // Если элемент не найден, пытаемся найти его позже
+        setTimeout(() => {
+          const retryElement = document.getElementById(sectionId);
+          if (retryElement) {
+            console.log(`🔄 Retry successful for: ${sectionId}`);
+            const elementPosition = retryElement.getBoundingClientRect().top + window.pageYOffset;
+            const offsetPosition = elementPosition;
+            
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+          }
+        }, 200);
       }
     };
 
@@ -251,14 +269,32 @@ export default {
       optimizeAnimations();
       
       // Обработка хеша в URL после полной загрузки компонентов
+      // Увеличиваем задержку для гарантии полной инициализации всех компонентов и стилей
       setTimeout(() => {
         const hash = window.location.hash;
         if (hash && hash.length > 1) {
           const sectionId = hash.substring(1); // убираем #
           console.log(`🔗 Found hash in URL: ${sectionId}`);
-          scrollToSection(sectionId);
+          
+          // Дополнительная проверка что элемент существует и готов
+          const element = document.getElementById(sectionId);
+          if (element) {
+            // Принудительно сбрасываем скролл к верху перед навигацией
+            window.scrollTo(0, 0);
+            
+            // Даем еще небольшую паузу для сброса позиции
+            setTimeout(() => {
+              scrollToSection(sectionId);
+            }, 100);
+          } else {
+            console.warn(`Element with id "${sectionId}" not found, waiting...`);
+            // Если элемент не найден, пробуем еще раз через большую задержку
+            setTimeout(() => {
+              scrollToSection(sectionId);
+            }, 500);
+          }
         }
-      }, 300); // даем время на полную загрузку компонентов
+      }, 600); // увеличиваем задержку для стабильности
     });
 
     const navigateToAbout = () => {
